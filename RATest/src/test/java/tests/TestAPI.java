@@ -43,8 +43,8 @@ public class TestAPI {
 			userId = responseCreateUser.getId();
 			String createdAt = responseCreateUser.getCreatedAt();
 
-	       
-	        System.out.println("ID: " + userId);
+			System.out.println("CREATE USER VALID");
+	        System.out.println("ID do usuário: " + userId);
 	        System.out.println("Criado em: " + responseCreateUser.getCreatedAt());
 	        
 	        assertNotNull(userId, "O ID do user não pode ser null");
@@ -55,7 +55,7 @@ public class TestAPI {
 	}
 	
 	@Test
-	public void get_user() {
+	public void get_user_invalid() {
 		
 		if (userId == null || userId.isEmpty()) {
 			System.out.println("ID do user não está disponivel. Execute primeiro create_user.");
@@ -73,6 +73,8 @@ public class TestAPI {
 		        .body(equalTo("{}"))
 		        .extract()
 		        .response();
+		
+		System.out.println("GET USER INVALID");
 
 		int statusCode = response.getStatusCode();
 		System.out.println("Status code: " + statusCode);
@@ -84,6 +86,45 @@ public class TestAPI {
 		assertEquals(response.getBody().asString(), "{}", "O body deve estar vazio");
 
 	}
+	
+	@Test
+	public void get_user_valid() {
+		
+		RestAssured.baseURI = BASE_URI;
+		Response response =
+			given()
+				.pathParam("id", 2)
+	        .when()
+	        	.get("users/{id}")  
+	        .then()
+		        .statusCode(200)
+		        .contentType(ContentType.JSON) 
+		        .body("data.id", equalTo(2))
+		        .body("data.email", equalTo("janet.weaver@reqres.in"))
+		        .body("data.first_name", equalTo("Janet"))
+		        .body("data.last_name", equalTo("Weaver"))
+		        .body("data.avatar", equalTo("https://reqres.in/img/faces/2-image.jpg"))
+		        .body("support.url", equalTo("https://reqres.in/#support-heading"))
+		        .body("support.text", equalTo("To keep ReqRes free, contributions towards server costs are appreciated!"))
+		        .extract()
+		        .response();
+		
+		
+		System.out.println("GET USER VALID");
+		
+		int statusCode = response.getStatusCode();
+		System.out.println("Status code: " + statusCode);
+		
+		long responseTime = response.getTime();
+		System.out.println("Tempo de resposta: " + responseTime + " ms");
+		
+		assertEquals(response.getStatusCode(), 200, "Status code deve ser 200");
+		assertNotNull(response.body(), "Body não pode estar null");
+
+	}
+	
+	
+	
 }
 
 
